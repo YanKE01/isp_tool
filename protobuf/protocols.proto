@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package isppipeline;
+
+// 定义Bayer排列顺序的枚举
+enum BayerPattern {
+  RGGB = 0;
+  BGGR = 1;
+  GBRG = 2;
+  GRBG = 3;
+}
+
+// 定义上位机到下位机的抓拍指令
+message CaptureImageCommand {
+  string command = 1;  // 命令类型，例如"capture_image"
+  uint32 width = 2;    // 图像宽度
+  uint32 height = 3;   // 图像高度
+}
+
+// 定义上位机到下位机的ISP参数读取请求
+message ReadISPParametersCommand {
+  string command = 1;  // 命令类型，例如"read_isp_parameters"
+}
+
+// 定义ISP模块参数
+message ISPParameters {
+  // BLC
+  float r_offset = 1;
+  float gr_offset = 2;
+  float gb_offset = 3;
+  float b_offset = 4;
+
+  // 可以根据需要添加更多的ISP参数
+}
+
+// 定义下位机到上位机的ISP参数响应
+message ISPParametersResponse {
+  string status = 1;          // 响应状态，例如"success", "error"
+  string message = 2;         // 详细信息或错误描述
+  ISPParameters parameters = 3; // ISP模块参数
+}
+
+// 定义下位机到上位机的图片响应
+message ImageResponse {
+  string status = 1;          // 响应状态，例如"success", "error"
+  string message = 2;         // 详细信息或错误描述
+  bytes image_data = 3;       // 图片数据，以字节数组形式传输
+  uint32 width = 4;           // 图像宽度
+  uint32 height = 5;          // 图像高度
+  BayerPattern bayer_pattern = 6; // Bayer排列顺序
+  uint32 bit_depth = 7;       // 图像数据深度，以位为单位（例如8, 10, 12, 14, 16）
+}
+
+// 定义传输的数据包，可以包含不同类型的消息
+message DataPacket {
+  oneof payload {
+    CaptureImageCommand capture_image_command = 1;
+    ImageResponse image_response = 2;
+    ReadISPParametersCommand read_isp_parameters_command = 3;
+    ISPParametersResponse isp_parameters_response = 4;
+  }
+}
