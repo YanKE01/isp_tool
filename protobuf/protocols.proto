@@ -12,25 +12,32 @@ enum BayerPattern {
 
 // 定义上位机到下位机的抓拍指令
 message CaptureImageCommand {
-  string command = 1;  // 命令类型，例如"capture_image"
-  uint32 width = 2;    // 图像宽度
-  uint32 height = 3;   // 图像高度
+  uint32 width = 1;    // 图像宽度
+  uint32 height = 2;   // 图像高度
 }
 
 // 定义上位机到下位机的ISP参数读取请求
 message ReadISPParametersCommand {
-  string command = 1;  // 命令类型，例如"read_isp_parameters"
 }
 
-// 定义ISP模块参数
-message ISPParameters {
-  // BLC
+// 定义上位机到下位机的ISP参数写入请求
+message WriteISPParametersCommand {
+  ISPParameters parameters = 1;  // 要写入的ISP参数
+}
+
+// 定义BLC参数
+message BLCParameters {
   float r_offset = 1;
   float gr_offset = 2;
   float gb_offset = 3;
   float b_offset = 4;
+}
 
-  // 可以根据需要添加更多的ISP参数
+// 定义ISP模块参数，包含BLC以及未来的其他参数
+message ISPParameters {
+  BLCParameters blc = 1;
+  // 未来可以添加其他模块参数
+  // OtherModuleParameters other_module = 2;
 }
 
 // 定义下位机到上位机的ISP参数响应
@@ -58,5 +65,6 @@ message DataPacket {
     ImageResponse image_response = 2;
     ReadISPParametersCommand read_isp_parameters_command = 3;
     ISPParametersResponse isp_parameters_response = 4;
+    WriteISPParametersCommand write_isp_parameters_command = 5;
   }
 }
