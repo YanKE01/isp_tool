@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1172</width>
-    <height>767</height>
+    <width>1197</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -79,58 +79,235 @@
              <property name="frameShadow">
               <enum>QFrame::Raised</enum>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <layout class="QHBoxLayout" name="horizontalLayout_13">
               <item>
-               <widget class="QStackedWidget" name="parameterStackedWidget">
-                <property name="currentIndex">
-                 <number>0</number>
-                </property>
-                <widget class="QWidget" name="page">
-                 <widget class="QLabel" name="label_2">
-                  <property name="geometry">
-                   <rect>
-                    <x>390</x>
-                    <y>290</y>
-                    <width>54</width>
-                    <height>12</height>
-                   </rect>
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <widget class="QStackedWidget" name="parameterStackedWidget">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
                   </property>
-                  <property name="text">
-                   <string>blc</string>
+                  <property name="maximumSize">
+                   <size>
+                    <width>800</width>
+                    <height>16777215</height>
+                   </size>
                   </property>
+                  <property name="currentIndex">
+                   <number>0</number>
+                  </property>
+                  <widget class="QWidget" name="page">
+                   <layout class="QHBoxLayout" name="horizontalLayout_15">
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_3">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_9">
+                        <item>
+                         <widget class="QLabel" name="label_4">
+                          <property name="text">
+                           <string>Manual Offset R</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="manualOffsetRSpinBox">
+                          <property name="maximum">
+                           <number>4095</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSlider" name="manualOffsetRHorizontalSlider">
+                          <property name="maximum">
+                           <number>4095</number>
+                          </property>
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_10">
+                        <item>
+                         <widget class="QLabel" name="label_5">
+                          <property name="text">
+                           <string>Manual Offset Gr</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="manualOffsetGrSpinBox">
+                          <property name="maximum">
+                           <number>4095</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSlider" name="manualOffsetGrHorizontalSlider">
+                          <property name="maximum">
+                           <number>4095</number>
+                          </property>
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_11">
+                        <item>
+                         <widget class="QLabel" name="label_6">
+                          <property name="text">
+                           <string>Manual Offset Gb</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="manualOffsetGbSpinBox">
+                          <property name="maximum">
+                           <number>4095</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSlider" name="manualOffsetGbHorizontalSlider">
+                          <property name="maximum">
+                           <number>4095</number>
+                          </property>
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_12">
+                        <item>
+                         <widget class="QLabel" name="label_7">
+                          <property name="text">
+                           <string>Manual Offset B</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSpinBox" name="manualOffsetBSpinBox">
+                          <property name="maximum">
+                           <number>4095</number>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QSlider" name="manualOffsetBHorizontalSlider">
+                          <property name="maximum">
+                           <number>4095</number>
+                          </property>
+                          <property name="orientation">
+                           <enum>Qt::Horizontal</enum>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </widget>
+                  <widget class="QWidget" name="page_3">
+                   <widget class="QLabel" name="label">
+                    <property name="geometry">
+                     <rect>
+                      <x>410</x>
+                      <y>300</y>
+                      <width>54</width>
+                      <height>12</height>
+                     </rect>
+                    </property>
+                    <property name="text">
+                     <string>dpc</string>
+                    </property>
+                   </widget>
+                  </widget>
+                  <widget class="QWidget" name="page_2">
+                   <widget class="QLabel" name="label_3">
+                    <property name="geometry">
+                     <rect>
+                      <x>350</x>
+                      <y>340</y>
+                      <width>54</width>
+                      <height>12</height>
+                     </rect>
+                    </property>
+                    <property name="text">
+                     <string>lsc</string>
+                    </property>
+                   </widget>
+                  </widget>
                  </widget>
-                </widget>
-                <widget class="QWidget" name="page_3">
-                 <widget class="QLabel" name="label">
-                  <property name="geometry">
-                   <rect>
-                    <x>410</x>
-                    <y>300</y>
-                    <width>54</width>
-                    <height>12</height>
-                   </rect>
+                </item>
+                <item>
+                 <widget class="QFrame" name="frame_8">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
                   </property>
-                  <property name="text">
-                   <string>dpc</string>
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
                   </property>
+                  <property name="frameShape">
+                   <enum>QFrame::StyledPanel</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_14">
+                   <item>
+                    <layout class="QVBoxLayout" name="verticalLayout_4">
+                     <item>
+                      <widget class="QPushButton" name="readParamPushButton">
+                       <property name="text">
+                        <string>Read</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="writeParamPushButton">
+                       <property name="text">
+                        <string>Write</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="readAllParamPushButton">
+                       <property name="text">
+                        <string>Read all</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="writeAllParamPushButton">
+                       <property name="text">
+                        <string>Write all</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
                  </widget>
-                </widget>
-                <widget class="QWidget" name="page_2">
-                 <widget class="QLabel" name="label_3">
-                  <property name="geometry">
-                   <rect>
-                    <x>350</x>
-                    <y>340</y>
-                    <width>54</width>
-                    <height>12</height>
-                   </rect>
-                  </property>
-                  <property name="text">
-                   <string>lsc</string>
-                  </property>
-                 </widget>
-                </widget>
-               </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -218,8 +395,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1172</width>
-     <height>23</height>
+     <width>1197</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuopen">

@@ -12,6 +12,12 @@ PB_BIND(isppipeline_CaptureImageCommand, isppipeline_CaptureImageCommand, AUTO)
 PB_BIND(isppipeline_ReadISPParametersCommand, isppipeline_ReadISPParametersCommand, AUTO)
 
 
+PB_BIND(isppipeline_WriteISPParametersCommand, isppipeline_WriteISPParametersCommand, AUTO)
+
+
+PB_BIND(isppipeline_BLCParameters, isppipeline_BLCParameters, AUTO)
+
+
 PB_BIND(isppipeline_ISPParameters, isppipeline_ISPParameters, AUTO)
 
 

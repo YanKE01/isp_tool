@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QApplication, QWidget, QSlider, QSpinBox, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal
 from ui.ui_main import Ui_MainWindow
 from windows.window_connection_tcp import *
@@ -29,6 +29,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionraw.triggered.connect(self.show_calibration_window)
         # 设置log viewer
         self.clearLogButton.clicked.connect(self.logTextBrowser.clear)
+
+        # BLC界面的滑动条与输入框联动
+        self.manualOffsetBSpinBox.valueChanged.connect(self.manualOffsetBHorizontalSlider.setValue)
+        self.manualOffsetGbSpinBox.valueChanged.connect(self.manualOffsetGbHorizontalSlider.setValue)
+        self.manualOffsetGrSpinBox.valueChanged.connect(self.manualOffsetGrHorizontalSlider.setValue)
+        self.manualOffsetRSpinBox.valueChanged.connect(self.manualOffsetRHorizontalSlider.setValue)
 
     def show_connection_window(self):
         if self.connect_window is None or not self.connect_window.isVisible():

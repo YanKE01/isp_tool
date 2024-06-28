@@ -2,30 +2,34 @@ syntax = "proto3";
 
 package isppipeline;
 
-// 定义Bayer排列顺序的枚举
-enum BayerPattern {
-  RGGB = 0;
-  BGGR = 1;
-  GBRG = 2;
-  GRBG = 3;
+
+// Define the enumeration for image format
+enum ImageFormat {
+  JPG = 0;
+  RAW8 = 1;
+  RAW10 = 2;
+  RGB565 = 3;
+  RGB24 = 4;
+  // Additional formats can be added here
 }
 
-// 定义上位机到下位机的抓拍指令
+// Define the capture command from the host to the device
 message CaptureImageCommand {
-  uint32 width = 1;    // 图像宽度
-  uint32 height = 2;   // 图像高度
+  uint32 width = 1;    // Image width
+  uint32 height = 2;   // Image height
+  ImageFormat format = 3; // Image format type
 }
 
-// 定义上位机到下位机的ISP参数读取请求
+// Define the ISP parameter read request from the host to the device
 message ReadISPParametersCommand {
 }
 
-// 定义上位机到下位机的ISP参数写入请求
+// Define the ISP parameter write request from the host to the device
 message WriteISPParametersCommand {
-  ISPParameters parameters = 1;  // 要写入的ISP参数
+  ISPParameters parameters = 1;  // ISP parameters to write
 }
 
-// 定义BLC参数
+// Define BLC parameters
 message BLCParameters {
   float r_offset = 1;
   float gr_offset = 2;
@@ -33,32 +37,31 @@ message BLCParameters {
   float b_offset = 4;
 }
 
-// 定义ISP模块参数，包含BLC以及未来的其他参数
+// Define ISP module parameters, including BLC and future parameters
 message ISPParameters {
   BLCParameters blc = 1;
-  // 未来可以添加其他模块参数
+  // Future module parameters can be added
   // OtherModuleParameters other_module = 2;
 }
 
-// 定义下位机到上位机的ISP参数响应
+// Define the ISP parameters response from the device to the host
 message ISPParametersResponse {
-  string status = 1;          // 响应状态，例如"success", "error"
-  string message = 2;         // 详细信息或错误描述
-  ISPParameters parameters = 3; // ISP模块参数
+  string status = 1;          // Response status, e.g., "success", "error"
+  string message = 2;         // Detailed information or error description
+  ISPParameters parameters = 3; // ISP module parameters
 }
 
-// 定义下位机到上位机的图片响应
+// Define the image response from the device to the host
 message ImageResponse {
-  string status = 1;          // 响应状态，例如"success", "error"
-  string message = 2;         // 详细信息或错误描述
-  bytes image_data = 3;       // 图片数据，以字节数组形式传输
-  uint32 width = 4;           // 图像宽度
-  uint32 height = 5;          // 图像高度
-  BayerPattern bayer_pattern = 6; // Bayer排列顺序
-  uint32 bit_depth = 7;       // 图像数据深度，以位为单位（例如8, 10, 12, 14, 16）
+  string status = 1;          // Response status, e.g., "success", "error"
+  string message = 2;         // Detailed information or error description
+  bytes image_data = 3;       // Image data transmitted as a byte array
+  uint32 width = 4;           // Image width
+  uint32 height = 5;          // Image height
+  ImageFormat format = 6;     // Image format type
 }
 
-// 定义传输的数据包，可以包含不同类型的消息
+// Define the data packet that can contain different types of messages
 message DataPacket {
   oneof payload {
     CaptureImageCommand capture_image_command = 1;

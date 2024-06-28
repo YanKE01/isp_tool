@@ -10,56 +10,68 @@
 #endif
 
 /* Enum definitions */
-/* 定义Bayer排列顺序的枚举 */
-typedef enum _isppipeline_BayerPattern {
-    isppipeline_BayerPattern_RGGB = 0,
-    isppipeline_BayerPattern_BGGR = 1,
-    isppipeline_BayerPattern_GBRG = 2,
-    isppipeline_BayerPattern_GRBG = 3
-} isppipeline_BayerPattern;
+/* Define the enumeration for image format */
+typedef enum _isppipeline_ImageFormat {
+    isppipeline_ImageFormat_JPG = 0,
+    isppipeline_ImageFormat_RAW8 = 1,
+    isppipeline_ImageFormat_RAW10 = 2,
+    isppipeline_ImageFormat_RGB565 = 3,
+    isppipeline_ImageFormat_RGB24 = 4 /* Additional formats can be added here */
+} isppipeline_ImageFormat;
 
 /* Struct definitions */
-/* 定义上位机到下位机的抓拍指令 */
+/* Define the capture command from the host to the device */
 typedef struct _isppipeline_CaptureImageCommand {
-    pb_callback_t command; /* 命令类型，例如"capture_image" */
-    uint32_t width; /* 图像宽度 */
-    uint32_t height; /* 图像高度 */
+    uint32_t width; /* Image width */
+    uint32_t height; /* Image height */
+    isppipeline_ImageFormat format; /* Image format type */
 } isppipeline_CaptureImageCommand;
 
-/* 定义上位机到下位机的ISP参数读取请求 */
+/* Define the ISP parameter read request from the host to the device */
 typedef struct _isppipeline_ReadISPParametersCommand {
-    pb_callback_t command; /* 命令类型，例如"read_isp_parameters" */
+    char dummy_field;
 } isppipeline_ReadISPParametersCommand;
 
-/* 定义ISP模块参数 */
-typedef struct _isppipeline_ISPParameters {
-    /* BLC */
+/* Define BLC parameters */
+typedef struct _isppipeline_BLCParameters {
     float r_offset;
     float gr_offset;
     float gb_offset;
     float b_offset;
+} isppipeline_BLCParameters;
+
+/* Define ISP module parameters, including BLC and future parameters */
+typedef struct _isppipeline_ISPParameters {
+    bool has_blc;
+    isppipeline_BLCParameters blc; /* Future module parameters can be added
+ OtherModuleParameters other_module = 2; */
 } isppipeline_ISPParameters;
 
-/* 定义下位机到上位机的ISP参数响应 */
-typedef struct _isppipeline_ISPParametersResponse {
-    pb_callback_t status; /* 响应状态，例如"success", "error" */
-    pb_callback_t message; /* 详细信息或错误描述 */
+/* Define the ISP parameter write request from the host to the device */
+typedef struct _isppipeline_WriteISPParametersCommand {
     bool has_parameters;
-    isppipeline_ISPParameters parameters; /* ISP模块参数 */
+    isppipeline_ISPParameters parameters; /* ISP parameters to write */
+} isppipeline_WriteISPParametersCommand;
+
+/* Define the ISP parameters response from the device to the host */
+typedef struct _isppipeline_ISPParametersResponse {
+    pb_callback_t status; /* Response status, e.g., "success", "error" */
+    pb_callback_t message; /* Detailed information or error description */
+    bool has_parameters;
+    isppipeline_ISPParameters parameters; /* ISP module parameters */
 } isppipeline_ISPParametersResponse;
 
-/* 定义下位机到上位机的图片响应 */
+/* Define the image response from the device to the host */
 typedef struct _isppipeline_ImageResponse {
-    pb_callback_t status; /* 响应状态，例如"success", "error" */
-    pb_callback_t message; /* 详细信息或错误描述 */
-    pb_callback_t image_data; /* 图片数据，以字节数组形式传输 */
-    uint32_t width; /* 图像宽度 */
-    uint32_t height; /* 图像高度 */
-    isppipeline_BayerPattern bayer_pattern; /* Bayer排列顺序 */
-    uint32_t bit_depth; /* 图像数据深度，以位为单位（例如8, 10, 12, 14, 16） */
+    pb_callback_t status; /* Response status, e.g., "success", "error" */
+    pb_callback_t message; /* Detailed information or error description */
+    pb_callback_t image_data; /* Image data transmitted as a byte array */
+    uint32_t width; /* Image width */
+    uint32_t height; /* Image height */
+    isppipeline_ImageFormat format; /* Image format type */
 } isppipeline_ImageResponse;
 
-/* 定义传输的数据包，可以包含不同类型的消息 */
+/* Define the data packet that can contain different types of messages */
 typedef struct _isppipeline_DataPacket {
     pb_size_t which_payload;
     union {
@@ -67,6 +79,7 @@ typedef struct _isppipeline_DataPacket {
         isppipeline_ImageResponse image_response;
         isppipeline_ReadISPParametersCommand read_isp_parameters_command;
         isppipeline_ISPParametersResponse isp_parameters_response;
+        isppipeline_WriteISPParametersCommand write_isp_parameters_command;
     } payload;
 } isppipeline_DataPacket;
 
@@ -76,41 +89,49 @@ extern "C" {
 #endif
 
 /* Helper constants for enums */
-#define _isppipeline_BayerPattern_MIN isppipeline_BayerPattern_RGGB
-#define _isppipeline_BayerPattern_MAX isppipeline_BayerPattern_GRBG
-#define _isppipeline_BayerPattern_ARRAYSIZE ((isppipeline_BayerPattern)(isppipeline_BayerPattern_GRBG+1))
+#define _isppipeline_ImageFormat_MIN isppipeline_ImageFormat_JPG
+#define _isppipeline_ImageFormat_MAX isppipeline_ImageFormat_RGB24
+#define _isppipeline_ImageFormat_ARRAYSIZE ((isppipeline_ImageFormat)(isppipeline_ImageFormat_RGB24+1))
+
+#define isppipeline_CaptureImageCommand_format_ENUMTYPE isppipeline_ImageFormat
 
 
 
 
 
-#define isppipeline_ImageResponse_bayer_pattern_ENUMTYPE isppipeline_BayerPattern
+
+#define isppipeline_ImageResponse_format_ENUMTYPE isppipeline_ImageFormat
 
 
 
 /* Initializer values for message structs */
-#define isppipeline_CaptureImageCommand_init_default {{{NULL}, NULL}, 0, 0}
-#define isppipeline_ReadISPParametersCommand_init_default {{{NULL}, NULL}}
-#define isppipeline_ISPParameters_init_default   {0, 0, 0, 0}
+#define isppipeline_CaptureImageCommand_init_default {0, 0, _isppipeline_ImageFormat_MIN}
+#define isppipeline_ReadISPParametersCommand_init_default {0}
+#define isppipeline_WriteISPParametersCommand_init_default {false, isppipeline_ISPParameters_init_default}
+#define isppipeline_BLCParameters_init_default   {0, 0, 0, 0}
+#define isppipeline_ISPParameters_init_default   {false, isppipeline_BLCParameters_init_default}
 #define isppipeline_ISPParametersResponse_init_default {{{NULL}, NULL}, {{NULL}, NULL}, false, isppipeline_ISPParameters_init_default}
-#define isppipeline_ImageResponse_init_default   {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, _isppipeline_BayerPattern_MIN, 0}
+#define isppipeline_ImageResponse_init_default   {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, _isppipeline_ImageFormat_MIN}
 #define isppipeline_DataPacket_init_default      {0, {isppipeline_CaptureImageCommand_init_default}}
-#define isppipeline_CaptureImageCommand_init_zero {{{NULL}, NULL}, 0, 0}
-#define isppipeline_ReadISPParametersCommand_init_zero {{{NULL}, NULL}}
-#define isppipeline_ISPParameters_init_zero      {0, 0, 0, 0}
+#define isppipeline_CaptureImageCommand_init_zero {0, 0, _isppipeline_ImageFormat_MIN}
+#define isppipeline_ReadISPParametersCommand_init_zero {0}
+#define isppipeline_WriteISPParametersCommand_init_zero {false, isppipeline_ISPParameters_init_zero}
+#define isppipeline_BLCParameters_init_zero      {0, 0, 0, 0}
+#define isppipeline_ISPParameters_init_zero      {false, isppipeline_BLCParameters_init_zero}
 #define isppipeline_ISPParametersResponse_init_zero {{{NULL}, NULL}, {{NULL}, NULL}, false, isppipeline_ISPParameters_init_zero}
-#define isppipeline_ImageResponse_init_zero      {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, _isppipeline_BayerPattern_MIN, 0}
+#define isppipeline_ImageResponse_init_zero      {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, _isppipeline_ImageFormat_MIN}
 #define isppipeline_DataPacket_init_zero         {0, {isppipeline_CaptureImageCommand_init_zero}}
 
 /* Field tags (for use in manual encoding/decoding) */
-#define isppipeline_CaptureImageCommand_command_tag 1
-#define isppipeline_CaptureImageCommand_width_tag 2
-#define isppipeline_CaptureImageCommand_height_tag 3
-#define isppipeline_ReadISPParametersCommand_command_tag 1
-#define isppipeline_ISPParameters_r_offset_tag   1
-#define isppipeline_ISPParameters_gr_offset_tag  2
-#define isppipeline_ISPParameters_gb_offset_tag  3
-#define isppipeline_ISPParameters_b_offset_tag   4
+#define isppipeline_CaptureImageCommand_width_tag 1
+#define isppipeline_CaptureImageCommand_height_tag 2
+#define isppipeline_CaptureImageCommand_format_tag 3
+#define isppipeline_BLCParameters_r_offset_tag   1
+#define isppipeline_BLCParameters_gr_offset_tag  2
+#define isppipeline_BLCParameters_gb_offset_tag  3
+#define isppipeline_BLCParameters_b_offset_tag   4
+#define isppipeline_ISPParameters_blc_tag        1
+#define isppipeline_WriteISPParametersCommand_parameters_tag 1
 #define isppipeline_ISPParametersResponse_status_tag 1
 #define isppipeline_ISPParametersResponse_message_tag 2
 #define isppipeline_ISPParametersResponse_parameters_tag 3
@@ -119,33 +140,45 @@ extern "C" {
 #define isppipeline_ImageResponse_image_data_tag 3
 #define isppipeline_ImageResponse_width_tag      4
 #define isppipeline_ImageResponse_height_tag     5
-#define isppipeline_ImageResponse_bayer_pattern_tag 6
-#define isppipeline_ImageResponse_bit_depth_tag  7
+#define isppipeline_ImageResponse_format_tag     6
 #define isppipeline_DataPacket_capture_image_command_tag 1
 #define isppipeline_DataPacket_image_response_tag 2
 #define isppipeline_DataPacket_read_isp_parameters_command_tag 3
 #define isppipeline_DataPacket_isp_parameters_response_tag 4
+#define isppipeline_DataPacket_write_isp_parameters_command_tag 5
 
 /* Struct field encoding specification for nanopb */
 #define isppipeline_CaptureImageCommand_FIELDLIST(X, a) \
-X(a, CALLBACK, SINGULAR, STRING,   command,           1) \
-X(a, STATIC,   SINGULAR, UINT32,   width,             2) \
-X(a, STATIC,   SINGULAR, UINT32,   height,            3)
-#define isppipeline_CaptureImageCommand_CALLBACK pb_default_field_callback
+X(a, STATIC,   SINGULAR, UINT32,   width,             1) \
+X(a, STATIC,   SINGULAR, UINT32,   height,            2) \
+X(a, STATIC,   SINGULAR, UENUM,    format,            3)
+#define isppipeline_CaptureImageCommand_CALLBACK NULL
 #define isppipeline_CaptureImageCommand_DEFAULT NULL
 
 #define isppipeline_ReadISPParametersCommand_FIELDLIST(X, a) \
-X(a, CALLBACK, SINGULAR, STRING,   command,           1)
-#define isppipeline_ReadISPParametersCommand_CALLBACK pb_default_field_callback
+
+#define isppipeline_ReadISPParametersCommand_CALLBACK NULL
 #define isppipeline_ReadISPParametersCommand_DEFAULT NULL
 
-#define isppipeline_ISPParameters_FIELDLIST(X, a) \
+#define isppipeline_WriteISPParametersCommand_FIELDLIST(X, a) \
+X(a, STATIC,   OPTIONAL, MESSAGE,  parameters,        1)
+#define isppipeline_WriteISPParametersCommand_CALLBACK NULL
+#define isppipeline_WriteISPParametersCommand_DEFAULT NULL
+#define isppipeline_WriteISPParametersCommand_parameters_MSGTYPE isppipeline_ISPParameters
+
+#define isppipeline_BLCParameters_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, FLOAT,    r_offset,          1) \
 X(a, STATIC,   SINGULAR, FLOAT,    gr_offset,         2) \
 X(a, STATIC,   SINGULAR, FLOAT,    gb_offset,         3) \
 X(a, STATIC,   SINGULAR, FLOAT,    b_offset,          4)
+#define isppipeline_BLCParameters_CALLBACK NULL
+#define isppipeline_BLCParameters_DEFAULT NULL
+
+#define isppipeline_ISPParameters_FIELDLIST(X, a) \
+X(a, STATIC,   OPTIONAL, MESSAGE,  blc,               1)
 #define isppipeline_ISPParameters_CALLBACK NULL
 #define isppipeline_ISPParameters_DEFAULT NULL
+#define isppipeline_ISPParameters_blc_MSGTYPE isppipeline_BLCParameters
 
 #define isppipeline_ISPParametersResponse_FIELDLIST(X, a) \
 X(a, CALLBACK, SINGULAR, STRING,   status,            1) \
@@ -161,8 +194,7 @@ X(a, CALLBACK, SINGULAR, STRING,   message,           2) \
 X(a, CALLBACK, SINGULAR, BYTES,    image_data,        3) \
 X(a, STATIC,   SINGULAR, UINT32,   width,             4) \
 X(a, STATIC,   SINGULAR, UINT32,   height,            5) \
-X(a, STATIC,   SINGULAR, UENUM,    bayer_pattern,     6) \
-X(a, STATIC,   SINGULAR, UINT32,   bit_depth,         7)
+X(a, STATIC,   SINGULAR, UENUM,    format,            6)
 #define isppipeline_ImageResponse_CALLBACK pb_default_field_callback
 #define isppipeline_ImageResponse_DEFAULT NULL
 
@@ -170,16 +202,20 @@ X(a, STATIC,   SINGULAR, UINT32,   bit_depth,         7)
 X(a, STATIC,   ONEOF,    MESSAGE,  (payload,capture_image_command,payload.capture_image_command),   1) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (payload,image_response,payload.image_response),   2) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (payload,read_isp_parameters_command,payload.read_isp_parameters_command),   3) \
-X(a, STATIC,   ONEOF,    MESSAGE,  (payload,isp_parameters_response,payload.isp_parameters_response),   4)
+X(a, STATIC,   ONEOF,    MESSAGE,  (payload,isp_parameters_response,payload.isp_parameters_response),   4) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (payload,write_isp_parameters_command,payload.write_isp_parameters_command),   5)
 #define isppipeline_DataPacket_CALLBACK NULL
 #define isppipeline_DataPacket_DEFAULT NULL
 #define isppipeline_DataPacket_payload_capture_image_command_MSGTYPE isppipeline_CaptureImageCommand
 #define isppipeline_DataPacket_payload_image_response_MSGTYPE isppipeline_ImageResponse
 #define isppipeline_DataPacket_payload_read_isp_parameters_command_MSGTYPE isppipeline_ReadISPParametersCommand
 #define isppipeline_DataPacket_payload_isp_parameters_response_MSGTYPE isppipeline_ISPParametersResponse
+#define isppipeline_DataPacket_payload_write_isp_parameters_command_MSGTYPE isppipeline_WriteISPParametersCommand
 
 extern const pb_msgdesc_t isppipeline_CaptureImageCommand_msg;
 extern const pb_msgdesc_t isppipeline_ReadISPParametersCommand_msg;
+extern const pb_msgdesc_t isppipeline_WriteISPParametersCommand_msg;
+extern const pb_msgdesc_t isppipeline_BLCParameters_msg;
 extern const pb_msgdesc_t isppipeline_ISPParameters_msg;
 extern const pb_msgdesc_t isppipeline_ISPParametersResponse_msg;
 extern const pb_msgdesc_t isppipeline_ImageResponse_msg;
@@ -188,19 +224,23 @@ extern const pb_msgdesc_t isppipeline_DataPacket_msg;
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define isppipeline_CaptureImageCommand_fields &isppipeline_CaptureImageCommand_msg
 #define isppipeline_ReadISPParametersCommand_fields &isppipeline_ReadISPParametersCommand_msg
+#define isppipeline_WriteISPParametersCommand_fields &isppipeline_WriteISPParametersCommand_msg
+#define isppipeline_BLCParameters_fields &isppipeline_BLCParameters_msg
 #define isppipeline_ISPParameters_fields &isppipeline_ISPParameters_msg
 #define isppipeline_ISPParametersResponse_fields &isppipeline_ISPParametersResponse_msg
 #define isppipeline_ImageResponse_fields &isppipeline_ImageResponse_msg
 #define isppipeline_DataPacket_fields &isppipeline_DataPacket_msg
 
 /* Maximum encoded size of messages (where known) */
-/* isppipeline_CaptureImageCommand_size depends on runtime parameters */
-/* isppipeline_ReadISPParametersCommand_size depends on runtime parameters */
 /* isppipeline_ISPParametersResponse_size depends on runtime parameters */
 /* isppipeline_ImageResponse_size depends on runtime parameters */
 /* isppipeline_DataPacket_size depends on runtime parameters */
-#define ISPPIPELINE_PROTOCOLS_PB_H_MAX_SIZE      isppipeline_ISPParameters_size
-#define isppipeline_ISPParameters_size           20
+#define ISPPIPELINE_PROTOCOLS_PB_H_MAX_SIZE      isppipeline_WriteISPParametersCommand_size
+#define isppipeline_BLCParameters_size           20
+#define isppipeline_CaptureImageCommand_size     14
+#define isppipeline_ISPParameters_size           22
+#define isppipeline_ReadISPParametersCommand_size 0
+#define isppipeline_WriteISPParametersCommand_size 24
 
 #ifdef __cplusplus
 } /* extern "C" */
