@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package isppipeline;
+
+
+// Define the enumeration for image format
+enum ImageFormat {
+  JPG = 0;
+  RAW8 = 1;
+  RAW10 = 2;
+  RGB565 = 3;
+  RGB24 = 4;
+  // Additional formats can be added here
+}
+
+// Define the capture command from the host to the device
+message CaptureImageCommand {
+  uint32 width = 1;    // Image width
+  uint32 height = 2;   // Image height
+  ImageFormat format = 3; // Image format type
+}
+
+// Define the ISP parameter read request from the host to the device
+message ReadISPParametersCommand {
+}
+
+// Define the ISP parameter write request from the host to the device
+message WriteISPParametersCommand {
+  ISPParameters parameters = 1;  // ISP parameters to write
+}
+
+// Define BLC parameters
+message BLCParameters {
+  float r_offset = 1;
+  float gr_offset = 2;
+  float gb_offset = 3;
+  float b_offset = 4;
+}
+
+// Define ISP module parameters, including BLC and future parameters
+message ISPParameters {
+  BLCParameters blc = 1;
+  // Future module parameters can be added
+  // OtherModuleParameters other_module = 2;
+}
+
+// Define the ISP parameters response from the device to the host
+message ISPParametersResponse {
+  string status = 1;          // Response status, e.g., "success", "error"
+  string message = 2;         // Detailed information or error description
+  ISPParameters parameters = 3; // ISP module parameters
+}
+
+// Define the image response from the device to the host
+message ImageResponse {
+  string status = 1;          // Response status, e.g., "success", "error"
+  string message = 2;         // Detailed information or error description
+  bytes image_data = 3;       // Image data transmitted as a byte array
+  uint32 width = 4;           // Image width
+  uint32 height = 5;          // Image height
+  ImageFormat format = 6;     // Image format type
+}
+
+// Define the data packet that can contain different types of messages
+message DataPacket {
+  oneof payload {
+    CaptureImageCommand capture_image_command = 1;
+    ImageResponse image_response = 2;
+    ReadISPParametersCommand read_isp_parameters_command = 3;
+    ISPParametersResponse isp_parameters_response = 4;
+    WriteISPParametersCommand write_isp_parameters_command = 5;
+  }
+}
