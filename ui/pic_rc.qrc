@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="background">
+    <file>connect_success.png</file>
+  </qresource>
+</RCC>

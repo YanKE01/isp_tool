@@ -18,6 +18,9 @@ PB_BIND(isppipeline_WriteISPParametersCommand, isppipeline_WriteISPParametersCom
 PB_BIND(isppipeline_BLCParameters, isppipeline_BLCParameters, AUTO)
 
 
+PB_BIND(isppipeline_CCMParameters, isppipeline_CCMParameters, AUTO)
+
+
 PB_BIND(isppipeline_ISPParameters, isppipeline_ISPParameters, AUTO)
 
 

@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package isppipeline;
 
-
 // Define the enumeration for image format
 enum ImageFormat {
   JPG = 0;
@@ -26,7 +25,10 @@ message ReadISPParametersCommand {
 
 // Define the ISP parameter write request from the host to the device
 message WriteISPParametersCommand {
-  ISPParameters parameters = 1;  // ISP parameters to write
+  oneof parameter {
+    BLCParameters blc = 1;  // BLC parameters to write
+    CCMParameters ccm = 2;  // CCM parameters to write
+  }
 }
 
 // Define BLC parameters
@@ -37,11 +39,18 @@ message BLCParameters {
   float b_offset = 4;
 }
 
-// Define ISP module parameters, including BLC and future parameters
+// Define CCM parameters as a 1D array
+message CCMParameters {
+  bool enabled = 1; // Flag to enable or disable CCM
+  repeated float ccm = 2; // CCM parameters as an array of floats
+}
+
+// Define ISP module parameters, including BLC and CCM
 message ISPParameters {
   BLCParameters blc = 1;
+  CCMParameters ccm = 2;
   // Future module parameters can be added
-  // OtherModuleParameters other_module = 2;
+  // OtherModuleParameters other_module = 3;
 }
 
 // Define the ISP parameters response from the device to the host
