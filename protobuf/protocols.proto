@@ -28,6 +28,7 @@ message WriteISPParametersCommand {
   oneof parameter {
     BLCParameters blc = 1;  // BLC parameters to write
     CCMParameters ccm = 2;  // CCM parameters to write
+    GammaParameters gamma = 3; //Gamma parameters to write
   }
 }
 
@@ -45,10 +46,16 @@ message CCMParameters {
   repeated float ccm = 2; // CCM parameters as an array of floats
 }
 
+message GammaParameters {
+  bool enabled = 1;
+  repeated uint32 gamma = 2;
+}
+
 // Define ISP module parameters, including BLC and CCM
 message ISPParameters {
   BLCParameters blc = 1;
   CCMParameters ccm = 2;
+  GammaParameters gamma = 3;
   // Future module parameters can be added
   // OtherModuleParameters other_module = 3;
 }

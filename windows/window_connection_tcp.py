@@ -9,12 +9,12 @@ class ConnectionWindow(QMainWindow, ui.ui_connection_tcp.Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.connect_tcp.clicked.connect(self.on_connect_button_clicked)
+        self.connectTcpButton.clicked.connect(self.onConnectionButtonClicked)
         self.parent = parent
 
-    def on_connect_button_clicked(self):
-        ip_address = self.ip_addr.text()
-        port_number = self.ip_port.text()
+    def onConnectionButtonClicked(self):
+        ip_address = self.ipAddrLineEdit.text()
+        port_number = self.ipPortLineEdit.text()
 
         if not ip_address or not port_number:
             QMessageBox.warning(self, "Input Error", "Please enter a valid IP address and port number")

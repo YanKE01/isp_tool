@@ -46,7 +46,7 @@ class TcpClientThread(QThread):
                     pass  # 套接字已经关闭
                 self.sock.close()
 
-    def send_user_message(self, message: str):
+    def sendMessage(self, message: str):
         if self.sock:
             try:
                 self.sock.sendall(message)
