@@ -3,7 +3,7 @@ import socket
 
 ccm_parameters = protobuf.protocols_pb2.CCMParameters()
 ccm_parameters.ccm.extend([0, -0.2, 0.15, -0.35, 1.47, 0.35, 0.35, -0.45, 11.5])
-ccm_parameters.enabled = True
+ccm_parameters.enabled = False
 
 write_command = protobuf.protocols_pb2.WriteISPParametersCommand()
 write_command.ccm.CopyFrom(ccm_parameters)

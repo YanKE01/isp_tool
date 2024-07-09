@@ -9,6 +9,7 @@ from tuning.ccm_parameter import *
 from utils.utils import *
 import protobuf.protocols_pb2
 from windows.gamma_plot_widget import PlotWidget
+import windows.window_capture_image
 
 
 class MainWindow(QMainWindow, ui.ui_main.Ui_MainWindow):
@@ -16,6 +17,7 @@ class MainWindow(QMainWindow, ui.ui_main.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.tcp_connection_window = None
+        self.capture_image_window = None
         self.tcp_thread = None
         self.gamma_plot_widget = None
         self.gamma_point_num = 16
@@ -67,12 +69,24 @@ class MainWindow(QMainWindow, ui.ui_main.Ui_MainWindow):
         else:
             self.tcp_connection_window.raise_()
 
+    def showCaptureImageWindow(self):
+        if self.capture_image_window is None:
+            self.capture_image_window = windows.window_capture_image.CaptureImageWindow(self)
+            self.capture_image_window.capture_image_signal.connect(self.handleCaptureImage)
+        if not self.capture_image_window.isVisible():
+            self.capture_image_window.show()
+        else:
+            self.capture_image_window.raise_()
+
     def singalSlotInit(self):
         self.actionconnect_board.triggered.connect(
             self.showTcpConnectionWindow)  # Press Connect Board in the menu bar to open the tcp connection window
         self.ispListWidget.currentRowChanged.connect(self.handleIspListChange)
         self.actiondisconnect_board.triggered.connect(self.cleanTcpConnection)
         self.writeParameterButton.clicked.connect(self.singleParameterWrite)
+        self.actionimage.triggered.connect(self.showCaptureImageWindow)
+        self.searchButton.clicked.connect(self.handleSearchButton)
+        self.readParameterButton.clicked.connect(self.singleParameterRead)
 
     def cleanTcpConnection(self):
         if self.tcp_thread is not None:
@@ -111,6 +125,20 @@ class MainWindow(QMainWindow, ui.ui_main.Ui_MainWindow):
                 if self.tcp_thread:
                     self.tcp_thread.sendMessage(serialized_command)
 
+    def singleParameterRead(self):
+        print("single parameter read")
+        if self.ispParameterstackedWidget.currentIndex() == 0:
+            pass
+        elif self.ispParameterstackedWidget.currentIndex() == 1:
+            # Read ccm parameters
+            read_command = protobuf.protocols_pb2.ReadISPParametersCommand()
+            read_command.parameter_type = protobuf.protocols_pb2.ISPParameterType.CCM
+            data_packet = protobuf.protocols_pb2.DataPacket()
+            data_packet.read_isp_parameters_command.CopyFrom(read_command)
+            serialized_read_command = data_packet.SerializeToString()
+            if self.tcp_thread:
+                self.tcp_thread.sendMessage(serialized_read_command)
+
     @pyqtSlot(str, str)
     def hanleTcpConnectWindowsInfo(self, ip_addr, ip_port):
         message = f"Board address:{ip_addr}:{ip_port}"
@@ -143,3 +171,14 @@ class MainWindow(QMainWindow, ui.ui_main.Ui_MainWindow):
     @pyqtSlot(int)
     def handleIspListChange(self, index):
         self.ispParameterstackedWidget.setCurrentIndex(index)
+
+    @pyqtSlot(bytes)
+    def handleCaptureImage(self, command):
+        formatted_message = self.utils.format_message("Capture image")
+        self.systemLogTextEdit.append(formatted_message)
+        if self.tcp_thread:
+            self.tcp_thread.sendMessage(command)
+        pass
+
+    def handleSearchButton(self):
+        print("search:{}".format(self.searchLineEdit.text()))

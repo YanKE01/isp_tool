@@ -5,11 +5,19 @@ package isppipeline;
 // Define the enumeration for image format
 enum ImageFormat {
   JPG = 0;
-  RAW8 = 1;
-  RAW10 = 2;
+  BGGR_RAW8 = 1;
+  BGGR_RAW10 = 2;
   RGB565 = 3;
-  RGB24 = 4;
+  RGB888 = 4;
   // Additional formats can be added here
+}
+
+// Define the enumeration for ISP parameter type
+enum ISPParameterType {
+  BLC = 0;
+  CCM = 1;
+  GAMMA = 2;
+  // Additional parameter types can be added here
 }
 
 // Define the capture command from the host to the device
@@ -21,6 +29,7 @@ message CaptureImageCommand {
 
 // Define the ISP parameter read request from the host to the device
 message ReadISPParametersCommand {
+    ISPParameterType parameter_type = 1; // Type of ISP parameter to read
 }
 
 // Define the ISP parameter write request from the host to the device
@@ -64,7 +73,8 @@ message ISPParameters {
 message ISPParametersResponse {
   string status = 1;          // Response status, e.g., "success", "error"
   string message = 2;         // Detailed information or error description
-  ISPParameters parameters = 3; // ISP module parameters
+  ISPParameterType parameter_type = 3; // Type of ISP parameter returned
+  ISPParameters parameters = 4; // ISP module parameters
 }
 
 // Define the image response from the device to the host

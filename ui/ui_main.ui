@@ -215,7 +215,7 @@
                </size>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="page">
                <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -341,6 +341,51 @@
                     <string>B</string>
                    </property>
                   </column>
+                  <item row="0" column="0">
+                   <property name="text">
+                    <string>1.5</string>
+                   </property>
+                  </item>
+                  <item row="0" column="1">
+                   <property name="text">
+                    <string>-0.2</string>
+                   </property>
+                  </item>
+                  <item row="0" column="2">
+                   <property name="text">
+                    <string>0.15</string>
+                   </property>
+                  </item>
+                  <item row="1" column="0">
+                   <property name="text">
+                    <string>-0.35</string>
+                   </property>
+                  </item>
+                  <item row="1" column="1">
+                   <property name="text">
+                    <string>1.47</string>
+                   </property>
+                  </item>
+                  <item row="1" column="2">
+                   <property name="text">
+                    <string>0.35</string>
+                   </property>
+                  </item>
+                  <item row="2" column="0">
+                   <property name="text">
+                    <string>0.35</string>
+                   </property>
+                  </item>
+                  <item row="2" column="1">
+                   <property name="text">
+                    <string>-0.45</string>
+                   </property>
+                  </item>
+                  <item row="2" column="2">
+                   <property name="text">
+                    <string>1.50</string>
+                   </property>
+                  </item>
                  </widget>
                 </item>
                 <item row="0" column="0">
@@ -497,8 +542,15 @@
     <addaction name="actionconnect_board"/>
     <addaction name="actiondisconnect_board"/>
    </widget>
+   <widget class="QMenu" name="menucapture">
+    <property name="title">
+     <string>capture</string>
+    </property>
+    <addaction name="actionimage"/>
+   </widget>
    <addaction name="menuopen"/>
    <addaction name="menuconnect"/>
+   <addaction name="menucapture"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionconnect_board">
@@ -511,9 +563,12 @@
     <string>disconnect_board</string>
    </property>
   </action>
+  <action name="actionimage">
+   <property name="text">
+    <string>image</string>
+   </property>
+  </action>
  </widget>
- <resources>
-  <include location="image.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

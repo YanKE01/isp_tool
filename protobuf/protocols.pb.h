@@ -13,11 +13,18 @@
 /* Define the enumeration for image format */
 typedef enum _isppipeline_ImageFormat {
     isppipeline_ImageFormat_JPG = 0,
-    isppipeline_ImageFormat_RAW8 = 1,
-    isppipeline_ImageFormat_RAW10 = 2,
+    isppipeline_ImageFormat_BGGR_RAW8 = 1,
+    isppipeline_ImageFormat_BGGR_RAW10 = 2,
     isppipeline_ImageFormat_RGB565 = 3,
-    isppipeline_ImageFormat_RGB24 = 4 /* Additional formats can be added here */
+    isppipeline_ImageFormat_RGB888 = 4 /* Additional formats can be added here */
 } isppipeline_ImageFormat;
+
+/* Define the enumeration for ISP parameter type */
+typedef enum _isppipeline_ISPParameterType {
+    isppipeline_ISPParameterType_BLC = 0,
+    isppipeline_ISPParameterType_CCM = 1,
+    isppipeline_ISPParameterType_GAMMA = 2 /* Additional parameter types can be added here */
+} isppipeline_ISPParameterType;
 
 /* Struct definitions */
 /* Define the capture command from the host to the device */
@@ -29,7 +36,7 @@ typedef struct _isppipeline_CaptureImageCommand {
 
 /* Define the ISP parameter read request from the host to the device */
 typedef struct _isppipeline_ReadISPParametersCommand {
-    char dummy_field;
+    isppipeline_ISPParameterType parameter_type; /* Type of ISP parameter to read */
 } isppipeline_ReadISPParametersCommand;
 
 /* Define BLC parameters */
@@ -78,6 +85,7 @@ typedef struct _isppipeline_ISPParameters {
 typedef struct _isppipeline_ISPParametersResponse {
     pb_callback_t status; /* Response status, e.g., "success", "error" */
     pb_callback_t message; /* Detailed information or error description */
+    isppipeline_ISPParameterType parameter_type; /* Type of ISP parameter returned */
     bool has_parameters;
     isppipeline_ISPParameters parameters; /* ISP module parameters */
 } isppipeline_ISPParametersResponse;
@@ -111,17 +119,23 @@ extern "C" {
 
 /* Helper constants for enums */
 #define _isppipeline_ImageFormat_MIN isppipeline_ImageFormat_JPG
-#define _isppipeline_ImageFormat_MAX isppipeline_ImageFormat_RGB24
-#define _isppipeline_ImageFormat_ARRAYSIZE ((isppipeline_ImageFormat)(isppipeline_ImageFormat_RGB24+1))
+#define _isppipeline_ImageFormat_MAX isppipeline_ImageFormat_RGB888
+#define _isppipeline_ImageFormat_ARRAYSIZE ((isppipeline_ImageFormat)(isppipeline_ImageFormat_RGB888+1))
+
+#define _isppipeline_ISPParameterType_MIN isppipeline_ISPParameterType_BLC
+#define _isppipeline_ISPParameterType_MAX isppipeline_ISPParameterType_GAMMA
+#define _isppipeline_ISPParameterType_ARRAYSIZE ((isppipeline_ISPParameterType)(isppipeline_ISPParameterType_GAMMA+1))
 
 #define isppipeline_CaptureImageCommand_format_ENUMTYPE isppipeline_ImageFormat
 
+#define isppipeline_ReadISPParametersCommand_parameter_type_ENUMTYPE isppipeline_ISPParameterType
 
 
 
 
 
 
+#define isppipeline_ISPParametersResponse_parameter_type_ENUMTYPE isppipeline_ISPParameterType
 
 #define isppipeline_ImageResponse_format_ENUMTYPE isppipeline_ImageFormat
 
@@ -129,23 +143,23 @@ extern "C" {
 
 /* Initializer values for message structs */
 #define isppipeline_CaptureImageCommand_init_default {0, 0, _isppipeline_ImageFormat_MIN}
-#define isppipeline_ReadISPParametersCommand_init_default {0}
+#define isppipeline_ReadISPParametersCommand_init_default {_isppipeline_ISPParameterType_MIN}
 #define isppipeline_WriteISPParametersCommand_init_default {0, {isppipeline_BLCParameters_init_default}}
 #define isppipeline_BLCParameters_init_default   {0, 0, 0, 0}
 #define isppipeline_CCMParameters_init_default   {0, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0}}
 #define isppipeline_GammaParameters_init_default {0, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
 #define isppipeline_ISPParameters_init_default   {false, isppipeline_BLCParameters_init_default, false, isppipeline_CCMParameters_init_default, false, isppipeline_GammaParameters_init_default}
-#define isppipeline_ISPParametersResponse_init_default {{{NULL}, NULL}, {{NULL}, NULL}, false, isppipeline_ISPParameters_init_default}
+#define isppipeline_ISPParametersResponse_init_default {{{NULL}, NULL}, {{NULL}, NULL}, _isppipeline_ISPParameterType_MIN, false, isppipeline_ISPParameters_init_default}
 #define isppipeline_ImageResponse_init_default   {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, _isppipeline_ImageFormat_MIN}
 #define isppipeline_DataPacket_init_default      {0, {isppipeline_CaptureImageCommand_init_default}}
 #define isppipeline_CaptureImageCommand_init_zero {0, 0, _isppipeline_ImageFormat_MIN}
-#define isppipeline_ReadISPParametersCommand_init_zero {0}
+#define isppipeline_ReadISPParametersCommand_init_zero {_isppipeline_ISPParameterType_MIN}
 #define isppipeline_WriteISPParametersCommand_init_zero {0, {isppipeline_BLCParameters_init_zero}}
 #define isppipeline_BLCParameters_init_zero      {0, 0, 0, 0}
 #define isppipeline_CCMParameters_init_zero      {0, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0}}
 #define isppipeline_GammaParameters_init_zero    {0, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
 #define isppipeline_ISPParameters_init_zero      {false, isppipeline_BLCParameters_init_zero, false, isppipeline_CCMParameters_init_zero, false, isppipeline_GammaParameters_init_zero}
-#define isppipeline_ISPParametersResponse_init_zero {{{NULL}, NULL}, {{NULL}, NULL}, false, isppipeline_ISPParameters_init_zero}
+#define isppipeline_ISPParametersResponse_init_zero {{{NULL}, NULL}, {{NULL}, NULL}, _isppipeline_ISPParameterType_MIN, false, isppipeline_ISPParameters_init_zero}
 #define isppipeline_ImageResponse_init_zero      {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0, _isppipeline_ImageFormat_MIN}
 #define isppipeline_DataPacket_init_zero         {0, {isppipeline_CaptureImageCommand_init_zero}}
 
@@ -153,6 +167,7 @@ extern "C" {
 #define isppipeline_CaptureImageCommand_width_tag 1
 #define isppipeline_CaptureImageCommand_height_tag 2
 #define isppipeline_CaptureImageCommand_format_tag 3
+#define isppipeline_ReadISPParametersCommand_parameter_type_tag 1
 #define isppipeline_BLCParameters_r_offset_tag   1
 #define isppipeline_BLCParameters_gr_offset_tag  2
 #define isppipeline_BLCParameters_gb_offset_tag  3
@@ -169,7 +184,8 @@ extern "C" {
 #define isppipeline_ISPParameters_gamma_tag      3
 #define isppipeline_ISPParametersResponse_status_tag 1
 #define isppipeline_ISPParametersResponse_message_tag 2
-#define isppipeline_ISPParametersResponse_parameters_tag 3
+#define isppipeline_ISPParametersResponse_parameter_type_tag 3
+#define isppipeline_ISPParametersResponse_parameters_tag 4
 #define isppipeline_ImageResponse_status_tag     1
 #define isppipeline_ImageResponse_message_tag    2
 #define isppipeline_ImageResponse_image_data_tag 3
@@ -191,7 +207,7 @@ X(a, STATIC,   SINGULAR, UENUM,    format,            3)
 #define isppipeline_CaptureImageCommand_DEFAULT NULL
 
 #define isppipeline_ReadISPParametersCommand_FIELDLIST(X, a) \
-
+X(a, STATIC,   SINGULAR, UENUM,    parameter_type,    1)
 #define isppipeline_ReadISPParametersCommand_CALLBACK NULL
 #define isppipeline_ReadISPParametersCommand_DEFAULT NULL
 
@@ -238,7 +254,8 @@ X(a, STATIC,   OPTIONAL, MESSAGE,  gamma,             3)
 #define isppipeline_ISPParametersResponse_FIELDLIST(X, a) \
 X(a, CALLBACK, SINGULAR, STRING,   status,            1) \
 X(a, CALLBACK, SINGULAR, STRING,   message,           2) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  parameters,        3)
+X(a, STATIC,   SINGULAR, UENUM,    parameter_type,    3) \
+X(a, STATIC,   OPTIONAL, MESSAGE,  parameters,        4)
 #define isppipeline_ISPParametersResponse_CALLBACK pb_default_field_callback
 #define isppipeline_ISPParametersResponse_DEFAULT NULL
 #define isppipeline_ISPParametersResponse_parameters_MSGTYPE isppipeline_ISPParameters
@@ -300,7 +317,7 @@ extern const pb_msgdesc_t isppipeline_DataPacket_msg;
 #define isppipeline_CaptureImageCommand_size     14
 #define isppipeline_GammaParameters_size         98
 #define isppipeline_ISPParameters_size           171
-#define isppipeline_ReadISPParametersCommand_size 0
+#define isppipeline_ReadISPParametersCommand_size 2
 #define isppipeline_WriteISPParametersCommand_size 100
 
 #ifdef __cplusplus
