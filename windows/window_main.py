@@ -73,6 +73,8 @@ class MainWindow(QMainWindow, ui.ui_main.Ui_MainWindow):
         if self.capture_image_window is None:
             self.capture_image_window = windows.window_capture_image.CaptureImageWindow(self)
             self.capture_image_window.capture_image_signal.connect(self.handleCaptureImage)
+            if self.tcp_thread:
+                self.tcp_thread.packet_image_received.connect(self.capture_image_window.decodeImageResponse)
         if not self.capture_image_window.isVisible():
             self.capture_image_window.show()
         else:
@@ -101,16 +103,17 @@ class MainWindow(QMainWindow, ui.ui_main.Ui_MainWindow):
         print("single parameter write,current page:{}".format(self.ispParameterstackedWidget.currentIndex()))
         if self.ispParameterstackedWidget.currentIndex() == 0:
             print(self.gamma_plot_widget.getRealPoints())
-            gamma_parameters = protobuf.protocols_pb2.GammaParameters()
-            gamma_parameters.gamma.extend(self.gamma_plot_widget.getRealPoints())
-            gamma_parameters.enabled = True
-            write_command = protobuf.protocols_pb2.WriteISPParametersCommand()
-            write_command.gamma.CopyFrom(gamma_parameters)
-            data_packet = protobuf.protocols_pb2.DataPacket()
-            data_packet.write_isp_parameters_command.CopyFrom(write_command)
-            serialized_command = data_packet.SerializeToString()
-            if self.tcp_thread:
-                self.tcp_thread.sendMessage(serialized_command)
+            if len(self.gamma_plot_widget.getRealPoints()) > 0:
+                gamma_parameters = protobuf.protocols_pb2.GammaParameters()
+                gamma_parameters.gamma.extend(self.gamma_plot_widget.getRealPoints())
+                gamma_parameters.enabled = True
+                write_command = protobuf.protocols_pb2.WriteISPParametersCommand()
+                write_command.gamma.CopyFrom(gamma_parameters)
+                data_packet = protobuf.protocols_pb2.DataPacket()
+                data_packet.write_isp_parameters_command.CopyFrom(write_command)
+                serialized_command = data_packet.SerializeToString()
+                if self.tcp_thread:
+                    self.tcp_thread.sendMessage(serialized_command)
         elif self.ispParameterstackedWidget.currentIndex() == 1:
             # Handling of CCM separate writes
             if self.tcp_thread:
@@ -145,7 +148,6 @@ class MainWindow(QMainWindow, ui.ui_main.Ui_MainWindow):
         formatted_message = self.utils.format_message(message)
         self.systemLogTextEdit.append(formatted_message)
         self.tcp_thread = windows.tcp_client_thread.TcpClientThread(ip_addr, ip_port)
-        self.tcp_thread.message_received.connect(self.displaySystemLog)
         self.tcp_thread.connection_error.connect(self.handleTcpConnectionError)
         self.tcp_thread.connection_success.connect(self.handleTcpConnectSuccess)
         self.tcp_thread.start()
